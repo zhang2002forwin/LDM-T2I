@@ -16,8 +16,11 @@ def load_model_from_config(config, ckpt, verbose=False):
     print(f"Loading model from {ckpt}")
     pl_sd = torch.load(ckpt, map_location="cpu")
     sd = pl_sd["state_dict"]
-    model = instantiate_from_config(config.model)
-    m, u = model.load_state_dict(sd, strict=False)
+    model = instantiate_from_config(config.model)  # 得到一个对象（已经init了）
+
+    # model.load_state_dict，加载参数到模型中，返回m 和 u
+    # m是missing keys，缺失的keys  u是unexpected keys，包含了之外的模型所需Key之外的Keys
+    m, u = model.load_state_dict(sd, strict=False)   # 加载预训练参数
     if len(m) > 0 and verbose:
         print("missing keys:")
         print(m)
@@ -28,7 +31,6 @@ def load_model_from_config(config, ckpt, verbose=False):
     model.cuda()
     model.eval()
     return model
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -102,9 +104,10 @@ if __name__ == "__main__":
         help="unconditional guidance scale: eps = eps(x, empty) + scale * (eps(x, cond) - eps(x, empty))",
     )
     opt = parser.parse_args()
-    # 你好？？测试 能不能推送成功
+
 
     config = OmegaConf.load("configs/latent-diffusion/txt2img-1p4B-eval.yaml")  # TODO: Optionally download from same location as ckpt and chnage this logic
+    # 根据config实例化一个类，加载ckpt文件
     model = load_model_from_config(config, "models/ldm/text2img-large/model.ckpt")  # TODO: check path
 
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")

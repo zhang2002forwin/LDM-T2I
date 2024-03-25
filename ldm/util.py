@@ -82,16 +82,21 @@ def instantiate_from_config(config):
         elif config == "__is_unconditional__":
             return None
         raise KeyError("Expected key `target` to instantiate.")
+
+    # 相当于
+    # obj = get_obj_from_str(config["target"])  # 返回一个空对象（未被实例化）
+    # return obj(**config.get("params", dict()))  # 用params实例化对象Obj
     return get_obj_from_str(config["target"])(**config.get("params", dict()))
 
 
 def get_obj_from_str(string, reload=False):
-    module, cls = string.rsplit(".", 1)
+    module, cls = string.rsplit(".", 1)  # 划分module和cls，module相当于文件所在路径，cls相当于是我们要使用的类名
     if reload:
         module_imp = importlib.import_module(module)
         importlib.reload(module_imp)
-    return getattr(importlib.import_module(module, package=None), cls)
 
+    # 返回一个空对象，实际是返回一个指针
+    return getattr(importlib.import_module(module, package=None), cls)
 
 def _do_parallel_data_prefetch(func, Q, data, idx, idx_to_fn=False):
     # create dummy dataset instance

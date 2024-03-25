@@ -102,7 +102,7 @@ if __name__ == "__main__":
         help="unconditional guidance scale: eps = eps(x, empty) + scale * (eps(x, cond) - eps(x, empty))",
     )
     opt = parser.parse_args()
-
+    # 你好？？测试 能不能推送成功
 
     config = OmegaConf.load("configs/latent-diffusion/txt2img-1p4B-eval.yaml")  # TODO: Optionally download from same location as ckpt and chnage this logic
     model = load_model_from_config(config, "models/ldm/text2img-large/model.ckpt")  # TODO: check path

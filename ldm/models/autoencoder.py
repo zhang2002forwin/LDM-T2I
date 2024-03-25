@@ -284,7 +284,7 @@ class VQModelInterface(VQModel):
 
 class AutoencoderKL(pl.LightningModule):
     def __init__(self,
-                 ddconfig,
+                 ddconfig,  # yaml中有
                  lossconfig,
                  embed_dim,
                  ckpt_path=None,
@@ -321,24 +321,24 @@ class AutoencoderKL(pl.LightningModule):
         self.load_state_dict(sd, strict=False)
         print(f"Restored from {path}")
 
-    def encode(self, x):
+    def encode(self, x):  # 编码
         h = self.encoder(x)
         moments = self.quant_conv(h)
         posterior = DiagonalGaussianDistribution(moments)
         return posterior
 
-    def decode(self, z):
+    def decode(self, z):  # 解码
         z = self.post_quant_conv(z)
         dec = self.decoder(z)
         return dec
 
-    def forward(self, input, sample_posterior=True):
-        posterior = self.encode(input)
-        if sample_posterior:
+    def forward(self, input, sample_posterior=True): # 将input编码、采样、 然后解码
+        posterior = self.encode(input)   # 将input 编码
+        if sample_posterior:             # 编码后 采样
             z = posterior.sample()
         else:
             z = posterior.mode()
-        dec = self.decode(z)
+        dec = self.decode(z)             # 采样后 解码
         return dec, posterior
 
     def get_input(self, batch, k):

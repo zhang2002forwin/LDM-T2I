@@ -24,17 +24,20 @@ class DiracDistribution(AbstractDistribution):
 class DiagonalGaussianDistribution(object):
     def __init__(self, parameters, deterministic=False):
         self.parameters = parameters
+        # 沿着dim=1维度(第2维)分块，分成chunks=2块
         self.mean, self.logvar = torch.chunk(parameters, 2, dim=1)
+        # 将参数logvar的数据阶段，保持在[-30,20]区间中。即将小于-30的元素设置为 -30.0、将大于20的元素设置为20.0
         self.logvar = torch.clamp(self.logvar, -30.0, 20.0)
         self.deterministic = deterministic
-        self.std = torch.exp(0.5 * self.logvar)
-        self.var = torch.exp(self.logvar)
+        # 对 0.5*self.logvar 张量的每个数值都取指数
+        self.std = torch.exp(0.5 * self.logvar)  # 计算标准差
+        self.var = torch.exp(self.logvar)        # 计算方差
         if self.deterministic:
             self.var = self.std = torch.zeros_like(self.mean).to(device=self.parameters.device)
 
     def sample(self):
         x = self.mean + self.std * torch.randn(self.mean.shape).to(device=self.parameters.device)
-        return x
+        return x # 返回一个具体的latent
 
     def kl(self, other=None):
         if self.deterministic:
@@ -59,7 +62,7 @@ class DiagonalGaussianDistribution(object):
             dim=dims)
 
     def mode(self):
-        return self.mean
+        return self.mean  # 得到均值
 
 
 def normal_kl(mean1, logvar1, mean2, logvar2):

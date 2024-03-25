@@ -7,6 +7,7 @@ from einops import rearrange
 
 from ldm.util import instantiate_from_config
 from ldm.modules.attention import LinearAttention
+from ldm.modules.distributions.distributions import DiagonalGaussianDistribution
 
 
 def get_timestep_embedding(timesteps, embedding_dim):
@@ -36,6 +37,9 @@ def nonlinearity(x):
 
 
 def Normalize(in_channels, num_groups=32):
+    # torch.nn.GroupNorm 分组归一化层
+    # 参数解释：按照输入通道分成num_groups个组的，每个组都将独立进行归一化，并且具有自己的均值和方差
+    # num_channels 输入的通道数
     return torch.nn.GroupNorm(num_groups=num_groups, num_channels=in_channels, eps=1e-6, affine=True)
 
 
@@ -364,7 +368,7 @@ class Model(nn.Module):
     def get_last_layer(self):
         return self.conv_out.weight
 
-
+# 自动编码器  encoder下采样 和 decoder上采样
 class Encoder(nn.Module):
     def __init__(self, *, ch, out_ch, ch_mult=(1,2,4,8), num_res_blocks,
                  attn_resolutions, dropout=0.0, resamp_with_conv=True, in_channels,
@@ -375,33 +379,33 @@ class Encoder(nn.Module):
         self.ch = ch
         self.temb_ch = 0
         self.num_resolutions = len(ch_mult)
-        self.num_res_blocks = num_res_blocks
-        self.resolution = resolution
+        self.num_res_blocks = num_res_blocks  # res_block块个数
+        self.resolution = resolution   # 分辨率
         self.in_channels = in_channels
 
         # downsampling
         self.conv_in = torch.nn.Conv2d(in_channels,
-                                       self.ch,
+                                       self.ch,  # out_channel = self.ch # 输出通道
                                        kernel_size=3,
                                        stride=1,
                                        padding=1)
 
-        curr_res = resolution
-        in_ch_mult = (1,)+tuple(ch_mult)
+        curr_res = resolution   # 当前的分辨率
+        in_ch_mult = (1,)+tuple(ch_mult)  # 元组连接，按照config，结果是(1，1，2，4，4) 按照默认结果是(1,1,2,4,8)
         self.in_ch_mult = in_ch_mult
         self.down = nn.ModuleList()
-        for i_level in range(self.num_resolutions):
+        for i_level in range(self.num_resolutions):  # range(4)
             block = nn.ModuleList()
             attn = nn.ModuleList()
-            block_in = ch*in_ch_mult[i_level]
-            block_out = ch*ch_mult[i_level]
-            for i_block in range(self.num_res_blocks):
+            block_in = ch*in_ch_mult[i_level]   # in_ch_mult 是(1,1,2,4,4)
+            block_out = ch*ch_mult[i_level]     # ch_mult 是(1,2,4,4)
+            for i_block in range(self.num_res_blocks):  # range(2)
                 block.append(ResnetBlock(in_channels=block_in,
                                          out_channels=block_out,
-                                         temb_channels=self.temb_ch,
+                                         temb_channels=self.temb_ch,  # temb_ch 是 0
                                          dropout=dropout))
                 block_in = block_out
-                if curr_res in attn_resolutions:
+                if curr_res in attn_resolutions:  # 空list []
                     attn.append(make_attn(block_in, attn_type=attn_type))
             down = nn.Module()
             down.block = block
@@ -437,8 +441,8 @@ class Encoder(nn.Module):
 
         # downsampling
         hs = [self.conv_in(x)]
-        for i_level in range(self.num_resolutions):
-            for i_block in range(self.num_res_blocks):
+        for i_level in range(self.num_resolutions):  # range(4)  分辨率数是4
+            for i_block in range(self.num_res_blocks):  # range(2)
                 h = self.down[i_level].block[i_block](hs[-1], temb)
                 if len(self.down[i_level].attn) > 0:
                     h = self.down[i_level].attn[i_block](h)
@@ -446,13 +450,13 @@ class Encoder(nn.Module):
             if i_level != self.num_resolutions-1:
                 hs.append(self.down[i_level].downsample(hs[-1]))
 
-        # middle
+        # middle   # 两层ResnetBlock
         h = hs[-1]
         h = self.mid.block_1(h, temb)
         h = self.mid.attn_1(h)
         h = self.mid.block_2(h, temb)
 
-        # end
+        # end     # 两层ResnetBlock
         h = self.norm_out(h)
         h = nonlinearity(h)
         h = self.conv_out(h)

@@ -34,6 +34,8 @@ __conditioning_keys__ = {'concat': 'c_concat',
 def disabled_train(self, mode=True):
     """Overwrite model.train with this function to make sure train/eval mode
     does not change anymore."""
+    # 调用 disabled_train 方法后，模型的状态都不会发生改变。
+    # 为了在特定情况下禁用模型的训练模式切换功能，从而确保模型一直保持在特定的模式下运行，而不受外部环境的影响。
     return self
 
 
@@ -457,7 +459,7 @@ class LatentDiffusion(DDPM):
             self.scale_factor = scale_factor
         else:
             self.register_buffer('scale_factor', torch.tensor(scale_factor))
-        self.instantiate_first_stage(first_stage_config)
+        self.instantiate_first_stage(first_stage_config)  # 加载
         self.instantiate_cond_stage(cond_stage_config)
         self.cond_stage_forward = cond_stage_forward
         self.clip_denoised = False
@@ -499,14 +501,14 @@ class LatentDiffusion(DDPM):
         if self.shorten_cond_schedule:
             self.make_cond_schedule()
 
-    def instantiate_first_stage(self, config):
-        model = instantiate_from_config(config)
-        self.first_stage_model = model.eval()
+    def instantiate_first_stage(self, config):  # 实例化config文件中的 first_stage_config
+        model = instantiate_from_config(config)  # 用config实例化first_stage_config类
+        self.first_stage_model = model.eval()  # t2i中是AutoencoderKL
         self.first_stage_model.train = disabled_train
         for param in self.first_stage_model.parameters():
             param.requires_grad = False
 
-    def instantiate_cond_stage(self, config):
+    def instantiate_cond_stage(self, config):  # 实例化config文件中的 cond_stage_config
         if not self.cond_stage_trainable:
             if config == "__is_first_stage__":
                 print("Using first stage also as cond stage.")
@@ -540,8 +542,9 @@ class LatentDiffusion(DDPM):
         return denoise_grid
 
     def get_first_stage_encoding(self, encoder_posterior):
+        # encoder之后的高斯分布encoder_posterior
         if isinstance(encoder_posterior, DiagonalGaussianDistribution):
-            z = encoder_posterior.sample()
+            z = encoder_posterior.sample()  # 返回一个Latent,对应论文图中的Z
         elif isinstance(encoder_posterior, torch.Tensor):
             z = encoder_posterior
         else:
@@ -552,7 +555,7 @@ class LatentDiffusion(DDPM):
         if self.cond_stage_forward is None:
             if hasattr(self.cond_stage_model, 'encode') and callable(self.cond_stage_model.encode):
                 c = self.cond_stage_model.encode(c)
-                if isinstance(c, DiagonalGaussianDistribution):
+                if isinstance(c, DiagonalGaussianDistribution): #
                     c = c.mode()
             else:
                 c = self.cond_stage_model(c)
@@ -824,42 +827,47 @@ class LatentDiffusion(DDPM):
 
     @torch.no_grad()
     def encode_first_stage(self, x):
+        #  hasattr(self, "split_input_params")，检查本类中是否有split_input_params的方法
+        #  有，返回True ，无，返回False
+        #  类中并没有 split_input_params的方法
         if hasattr(self, "split_input_params"):
-            if self.split_input_params["patch_distributed_vq"]:
-                ks = self.split_input_params["ks"]  # eg. (128, 128)
-                stride = self.split_input_params["stride"]  # eg. (64, 64)
-                df = self.split_input_params["vqf"]
-                self.split_input_params['original_image_size'] = x.shape[-2:]
-                bs, nc, h, w = x.shape
-                if ks[0] > h or ks[1] > w:
-                    ks = (min(ks[0], h), min(ks[1], w))
-                    print("reducing Kernel")
-
-                if stride[0] > h or stride[1] > w:
-                    stride = (min(stride[0], h), min(stride[1], w))
-                    print("reducing stride")
-
-                fold, unfold, normalization, weighting = self.get_fold_unfold(x, ks, stride, df=df)
-                z = unfold(x)  # (bn, nc * prod(**ks), L)
-                # Reshape to img shape
-                z = z.view((z.shape[0], -1, ks[0], ks[1], z.shape[-1]))  # (bn, nc, ks[0], ks[1], L )
-
-                output_list = [self.first_stage_model.encode(z[:, :, :, :, i])
-                               for i in range(z.shape[-1])]
-
-                o = torch.stack(output_list, axis=-1)
-                o = o * weighting
-
-                # Reverse reshape to img shape
-                o = o.view((o.shape[0], -1, o.shape[-1]))  # (bn, nc * ks[0] * ks[1], L)
-                # stitch crops together
-                decoded = fold(o)
-                decoded = decoded / normalization
-                return decoded
-
-            else:
-                return self.first_stage_model.encode(x)
+            # 不会执行
+            pass
+            # if self.split_input_params["patch_distributed_vq"]:
+            #     ks = self.split_input_params["ks"]  # eg. (128, 128)
+            #     stride = self.split_input_params["stride"]  # eg. (64, 64)
+            #     df = self.split_input_params["vqf"]
+            #     self.split_input_params['original_image_size'] = x.shape[-2:]
+            #     bs, nc, h, w = x.shape
+            #     if ks[0] > h or ks[1] > w:
+            #         ks = (min(ks[0], h), min(ks[1], w))
+            #         print("reducing Kernel")
+            #
+            #     if stride[0] > h or stride[1] > w:
+            #         stride = (min(stride[0], h), min(stride[1], w))
+            #         print("reducing stride")
+            #
+            #     fold, unfold, normalization, weighting = self.get_fold_unfold(x, ks, stride, df=df)
+            #     z = unfold(x)  # (bn, nc * prod(**ks), L)
+            #     # Reshape to img shape
+            #     z = z.view((z.shape[0], -1, ks[0], ks[1], z.shape[-1]))  # (bn, nc, ks[0], ks[1], L )
+            #
+            #     output_list = [self.first_stage_model.encode(z[:, :, :, :, i])
+            #                    for i in range(z.shape[-1])]
+            #
+            #     o = torch.stack(output_list, axis=-1)
+            #     o = o * weighting
+            #
+            #     # Reverse reshape to img shape
+            #     o = o.view((o.shape[0], -1, o.shape[-1]))  # (bn, nc * ks[0] * ks[1], L)
+            #     # stitch crops together
+            #     decoded = fold(o)
+            #     decoded = decoded / normalization
+            #     return decoded
+            # else:
+            #     return self.first_stage_model.encode(x)
         else:
+            # t2i项目中 返回AutoencoderKL.encoder(x)，得到高斯分布的一个latent
             return self.first_stage_model.encode(x)
 
     def shared_step(self, batch, **kwargs):

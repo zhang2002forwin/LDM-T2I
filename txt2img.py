@@ -133,8 +133,10 @@ if __name__ == "__main__":
         with model.ema_scope():
             uc = None
             if opt.scale != 1.0:
+                # get_learned_conditioning(条件c) 根据条件c获得学习到的条件信息
+                # 此处获得uc，即unconditional_conditioning
                 uc = model.get_learned_conditioning(opt.n_samples * [""])
-            for n in trange(opt.n_iter, desc="Sampling"):
+            for n in trange(opt.n_iter, desc="Sampling,first for-loop"):
                 c = model.get_learned_conditioning(opt.n_samples * [prompt])
                 shape = [4, opt.H//8, opt.W//8]
                 samples_ddim, _ = sampler.sample(S=opt.ddim_steps,

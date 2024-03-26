@@ -143,7 +143,7 @@ if __name__ == "__main__":
                                                  conditioning=c,
                                                  batch_size=opt.n_samples,  # n_samples = 1
                                                  shape=shape,
-                                                 verbose=False,
+                                                 verbose=True,       # 源代码是False
                                                  unconditional_guidance_scale=opt.scale,
                                                  unconditional_conditioning=uc,
                                                  eta=opt.ddim_eta)

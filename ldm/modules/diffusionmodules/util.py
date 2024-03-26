@@ -44,9 +44,10 @@ def make_beta_schedule(schedule, n_timestep, linear_start=1e-4, linear_end=2e-2,
 
 
 def make_ddim_timesteps(ddim_discr_method, num_ddim_timesteps, num_ddpm_timesteps, verbose=True):
+    #                      "uniform"                50                1000              False
     if ddim_discr_method == 'uniform':
-        c = num_ddpm_timesteps // num_ddim_timesteps
-        ddim_timesteps = np.asarray(list(range(0, num_ddpm_timesteps, c)))
+        c = num_ddpm_timesteps // num_ddim_timesteps   # c = 20
+        ddim_timesteps = np.asarray(list(range(0, num_ddpm_timesteps, c)))  # range(0,1000,20) 共有50个数据
     elif ddim_discr_method == 'quad':
         ddim_timesteps = ((np.linspace(0, np.sqrt(num_ddpm_timesteps * .8), num_ddim_timesteps)) ** 2).astype(int)
     else:

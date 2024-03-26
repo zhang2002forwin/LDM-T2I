@@ -18,7 +18,7 @@ model:
     use_ema: False
 
     unet_config:
-      target: ldm.modules.diffusionmodules.openaimodel.UNetModel
+      target: ldm.modules.diffusionmodules.openaimodel.UNetModel  # UNet 扩散
       params:
         image_size: 32
         in_channels: 4
@@ -42,7 +42,7 @@ model:
         legacy: False
 
     first_stage_config:
-      target: ldm.models.autoencoder.AutoencoderKL
+      target: ldm.models.autoencoder.AutoencoderKL  # 感知压缩
       params:
         embed_dim: 4
         monitor: val/rec_loss
@@ -64,7 +64,7 @@ model:
         lossconfig:
           target: torch.nn.Identity
 
-    cond_stage_config:
+    cond_stage_config:        # 将条件转换成embedding,对于T2I仅使用BERT
       target: ldm.modules.encoders.modules.BERTEmbedder
       params:
         n_embed: 1280

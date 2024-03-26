@@ -12,23 +12,31 @@ class DDIMSampler(object):
     def __init__(self, model, schedule="linear", **kwargs):
         super().__init__()
         self.model = model
-        self.ddpm_num_timesteps = model.num_timesteps  # T2I的config里没有
+        self.ddpm_num_timesteps = model.num_timesteps  # T2I的config里没有, 推测就是timesteps=1000
         self.schedule = schedule     # T2I的config里没有
 
     def register_buffer(self, name, attr):
+        # 功能:将一个张量注册为模型的缓冲区
+        # name 是要注册缓冲区的名字  attr 是要注册的张量
         if type(attr) == torch.Tensor:
             if attr.device != torch.device("cuda"):
                 attr = attr.to(torch.device("cuda"))
+
+        # setattr 是将self的name属性 设置为attr , 如果self不存在属性name，则创建name属性
         setattr(self, name, attr)
 
     def make_schedule(self, ddim_num_steps, ddim_discretize="uniform", ddim_eta=0., verbose=True):
+        # ddim_num_steps = ddim_steps = 50 命令行参数指定值
+
+        # make_ddim_timesteps函数 return step_out
         self.ddim_timesteps = make_ddim_timesteps(ddim_discr_method=ddim_discretize, num_ddim_timesteps=ddim_num_steps,
                                                   num_ddpm_timesteps=self.ddpm_num_timesteps,verbose=verbose)
-        alphas_cumprod = self.model.alphas_cumprod
-        assert alphas_cumprod.shape[0] == self.ddpm_num_timesteps, 'alphas have to be defined for each timestep'
-        to_torch = lambda x: x.clone().detach().to(torch.float32).to(self.model.device)
 
-        self.register_buffer('betas', to_torch(self.model.betas))
+        alphas_cumprod = self.model.alphas_cumprod   # 不知道干啥的
+        assert alphas_cumprod.shape[0] == self.ddpm_num_timesteps, 'alphas have to be defined for each timestep'
+        to_torch = lambda x: x.clone().detach().to(torch.float32).to(self.model.device)   # x ？？
+
+        self.register_buffer('betas', to_torch(self.model.betas))              # betas
         self.register_buffer('alphas_cumprod', to_torch(alphas_cumprod))
         self.register_buffer('alphas_cumprod_prev', to_torch(self.model.alphas_cumprod_prev))
 
@@ -54,9 +62,9 @@ class DDIMSampler(object):
 
     @torch.no_grad()
     def sample(self,
-               S,  # 步数
-               batch_size, # 传入 n_samples = 1
-               shape,      # 我猜是 latent Z 的大小
+               S,  # ddim_steps 步数
+               batch_size, # 传入 n_samples = 1  由命令行参数指定
+               shape,      # 我猜是 latent Z 的大小,  但T2I并没有输入图像，T2I中shape = [4, opt.H//8, opt.W//8]
                conditioning=None,  # 条件c
                callback=None,
                normals_sequence=None,
@@ -69,7 +77,7 @@ class DDIMSampler(object):
                noise_dropout=0.,
                score_corrector=None,
                corrector_kwargs=None,
-               verbose=True,
+               verbose=True,             # verbose = Flase
                x_T=None,
                log_every_t=100,
                unconditional_guidance_scale=1.,   # scale 默认是5.0
@@ -86,57 +94,69 @@ class DDIMSampler(object):
                 if conditioning.shape[0] != batch_size:
                     print(f"Warning: Got {conditioning.shape[0]} conditionings but batch-size is {batch_size}")
 
-        self.make_schedule(ddim_num_steps=S, ddim_eta=eta, verbose=verbose)
+        self.make_schedule(ddim_num_steps=S, ddim_eta=eta, verbose=verbose)  # todo 没看看  # 没看完，函数后边有亿点复杂
         # sampling
         C, H, W = shape
-        size = (batch_size, C, H, W)
-        print(f'Data shape for DDIM sampling is {size}, eta {eta}')
+        size = (batch_size, C, H, W)   # batch_size = n_samples = 1
+        print(f'Data shape for DDIM sampling is {size}, eta {eta}')  # 这个执行了
 
-        samples, intermediates = self.ddim_sampling(conditioning, size,
-                                                    callback=callback,
-                                                    img_callback=img_callback,
-                                                    quantize_denoised=quantize_x0,
-                                                    mask=mask, x0=x0,
+        samples, intermediates = self.ddim_sampling(conditioning, size,    # 条件c， size = (n_samples=1, C, H, W)
+                                                    callback=callback,     # None
+                                                    img_callback=img_callback,  # None
+                                                    quantize_denoised=quantize_x0,  # False
+                                                    mask=mask, x0=x0,               # mask=None   x0=None
                                                     ddim_use_original_steps=False,
-                                                    noise_dropout=noise_dropout,
-                                                    temperature=temperature,
-                                                    score_corrector=score_corrector,
-                                                    corrector_kwargs=corrector_kwargs,
-                                                    x_T=x_T,
-                                                    log_every_t=log_every_t,
-                                                    unconditional_guidance_scale=unconditional_guidance_scale,
-                                                    unconditional_conditioning=unconditional_conditioning,
+                                                    noise_dropout=noise_dropout,    # 0
+                                                    temperature=temperature,        # 1
+                                                    score_corrector=score_corrector,# None
+                                                    corrector_kwargs=corrector_kwargs, # None
+                                                    x_T=x_T,                        # None
+                                                    log_every_t=log_every_t,        # 100
+                                                    unconditional_guidance_scale=unconditional_guidance_scale,  # scale 默认是5.0
+                                                    unconditional_conditioning=unconditional_conditioning,      # uc
                                                     )
         return samples, intermediates
 
     @torch.no_grad()
-    def ddim_sampling(self, cond, shape,
+    def ddim_sampling(self, cond, shape,      # c,  (n_samples=1, C, H, W)
                       x_T=None, ddim_use_original_steps=False,
                       callback=None, timesteps=None, quantize_denoised=False,
                       mask=None, x0=None, img_callback=None, log_every_t=100,
                       temperature=1., noise_dropout=0., score_corrector=None, corrector_kwargs=None,
                       unconditional_guidance_scale=1., unconditional_conditioning=None,):
+                # unconditional_guidance_scale = scale = 5.0 命令行参数指定，unconditional_conditioning = uc
         device = self.model.betas.device
-        b = shape[0]
+        b = shape[0]   # n_samples = 1
         if x_T is None:
-            img = torch.randn(shape, device=device)
+            img = torch.randn(shape, device=device)   # 随机数？随机噪声？
         else:
             img = x_T
 
         if timesteps is None:
+            # timesteps = self.ddim_timesteps
+            # 是make_ddim_timesteps函数的返回step_out
+            #  step_out=[  1  21  41  61  81 101 121 141 161 181 201 221 241 261 281 301 321 341
+            #  361 381 401 421 441 461 481 501 521 541 561 581 601 621 641 661 681 701
+            #  721 741 761 781 801 821 841 861 881 901 921 941 961 981]
             timesteps = self.ddpm_num_timesteps if ddim_use_original_steps else self.ddim_timesteps
         elif timesteps is not None and not ddim_use_original_steps:
             subset_end = int(min(timesteps / self.ddim_timesteps.shape[0], 1) * self.ddim_timesteps.shape[0]) - 1
             timesteps = self.ddim_timesteps[:subset_end]
 
         intermediates = {'x_inter': [img], 'pred_x0': [img]}
-        time_range = reversed(range(0,timesteps)) if ddim_use_original_steps else np.flip(timesteps)
-        total_steps = timesteps if ddim_use_original_steps else timesteps.shape[0]
-        print(f"Running DDIM Sampling with {total_steps} timesteps")
 
-        iterator = tqdm(time_range, desc='DDIM Sampler', total=total_steps)
+        # time_range =
+        # array([981, 961, 941, 921, 901, 881, 861, 841, 821, 801, 781, 761, 741,
+        #        721, 701, 681, 661, 641, 621, 601, 581, 561, 541, 521, 501, 481,
+        #        461, 441, 421, 401, 381, 361, 341, 321, 301, 281, 261, 241, 221,
+        #        201, 181, 161, 141, 121, 101,  81,  61,  41,  21,   1])
+        time_range = reversed(range(0,timesteps)) if ddim_use_original_steps else np.flip(timesteps) # np.flip(x) 是将x反转
+        total_steps = timesteps if ddim_use_original_steps else timesteps.shape[0]  # 不知道多少
+        print(f"Running DDIM Sampling with {total_steps} timesteps")    # 执行了
 
-        for i, step in enumerate(iterator):
+        iterator = tqdm(time_range, desc='DDIM Sampler', total=total_steps)    # 进度条
+
+        for i, step in enumerate(iterator):       # 扩散过程
             index = total_steps - i - 1
             ts = torch.full((b,), step, device=device, dtype=torch.long)
 

@@ -91,7 +91,7 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--n_samples",
+        "--n_samples",   # DDIMSampler.sample方法的batchsize
         type=int,
         default=4,
         help="how many samples to produce for the given prompt",
@@ -116,7 +116,7 @@ if __name__ == "__main__":
     if opt.plms:
         sampler = PLMSSampler(model)
     else:
-        sampler = DDIMSampler(model)
+        sampler = DDIMSampler(model)  # 执行这个
 
     os.makedirs(opt.outdir, exist_ok=True)
     outpath = opt.outdir
@@ -139,9 +139,9 @@ if __name__ == "__main__":
             for n in trange(opt.n_iter, desc="Sampling,first for-loop"):
                 c = model.get_learned_conditioning(opt.n_samples * [prompt])
                 shape = [4, opt.H//8, opt.W//8]
-                samples_ddim, _ = sampler.sample(S=opt.ddim_steps,
+                samples_ddim, _ = sampler.sample(S=opt.ddim_steps,  # ddim步数 50
                                                  conditioning=c,
-                                                 batch_size=opt.n_samples,
+                                                 batch_size=opt.n_samples,  # n_samples = 1
                                                  shape=shape,
                                                  verbose=False,
                                                  unconditional_guidance_scale=opt.scale,

@@ -12,8 +12,8 @@ class DDIMSampler(object):
     def __init__(self, model, schedule="linear", **kwargs):
         super().__init__()
         self.model = model
-        self.ddpm_num_timesteps = model.num_timesteps
-        self.schedule = schedule
+        self.ddpm_num_timesteps = model.num_timesteps  # T2I的config里没有
+        self.schedule = schedule     # T2I的config里没有
 
     def register_buffer(self, name, attr):
         if type(attr) == torch.Tensor:
@@ -54,15 +54,15 @@ class DDIMSampler(object):
 
     @torch.no_grad()
     def sample(self,
-               S,
-               batch_size,
-               shape,
-               conditioning=None,
+               S,  # 步数
+               batch_size, # 传入 n_samples = 1
+               shape,      # 我猜是 latent Z 的大小
+               conditioning=None,  # 条件c
                callback=None,
                normals_sequence=None,
                img_callback=None,
                quantize_x0=False,
-               eta=0.,
+               eta=0.,                    # ddim_eta= 0.0
                mask=None,
                x0=None,
                temperature=1.,
@@ -72,8 +72,8 @@ class DDIMSampler(object):
                verbose=True,
                x_T=None,
                log_every_t=100,
-               unconditional_guidance_scale=1.,
-               unconditional_conditioning=None,
+               unconditional_guidance_scale=1.,   # scale 默认是5.0
+               unconditional_conditioning=None,   # uc
                # this has to come in the same format as the conditioning, # e.g. as encoded tokens, ...
                **kwargs
                ):

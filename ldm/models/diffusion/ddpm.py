@@ -509,7 +509,7 @@ class LatentDiffusion(DDPM):
             param.requires_grad = False
 
     def instantiate_cond_stage(self, config):  # 实例化config文件中的 cond_stage_config
-        if not self.cond_stage_trainable:
+        if not self.cond_stage_trainable:  # BERT Embedder是直接拿来用，所以我推测 cond_stage_trianable 是false
             if config == "__is_first_stage__":
                 print("Using first stage also as cond stage.")
                 self.cond_stage_model = self.first_stage_model
@@ -517,8 +517,8 @@ class LatentDiffusion(DDPM):
                 print(f"Training {self.__class__.__name__} as an unconditional model.")
                 self.cond_stage_model = None
                 # self.be_unconditional = True
-            else:
-                model = instantiate_from_config(config)
+            else:        # T2I 执行这个
+                model = instantiate_from_config(config)  # 创建 BERT 类对象 ，然后eval()，而且不计算梯度
                 self.cond_stage_model = model.eval()
                 self.cond_stage_model.train = disabled_train
                 for param in self.cond_stage_model.parameters():
@@ -553,6 +553,8 @@ class LatentDiffusion(DDPM):
 
     def get_learned_conditioning(self, c):
         if self.cond_stage_forward is None:
+            # hasattr(self.cond_stage_model, 'encode') 检查cond_stage_model是否有encoder方法或属性
+            # callable(self.cond_stage_model.encode) 检查cond_stage_model的encoder是否可以调用
             if hasattr(self.cond_stage_model, 'encode') and callable(self.cond_stage_model.encode):
                 c = self.cond_stage_model.encode(c)
                 if isinstance(c, DiagonalGaussianDistribution): #

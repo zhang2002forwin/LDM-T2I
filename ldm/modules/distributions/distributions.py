@@ -24,7 +24,7 @@ class DiracDistribution(AbstractDistribution):
 class DiagonalGaussianDistribution(object):
     def __init__(self, parameters, deterministic=False):
         self.parameters = parameters
-        # 沿着dim=1维度(第2维)分块，分成chunks=2块
+        # 沿着dim=1维度(第2维)分块，分成chunks=2块,均值和对数方差
         self.mean, self.logvar = torch.chunk(parameters, 2, dim=1)
         # 将参数logvar的数据阶段，保持在[-30,20]区间中。即将小于-30的元素设置为 -30.0、将大于20的元素设置为20.0
         self.logvar = torch.clamp(self.logvar, -30.0, 20.0)

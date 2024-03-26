@@ -14,6 +14,9 @@ class AbstractEncoder(nn.Module):
         super().__init__()
 
     def encode(self, *args, **kwargs):
+        # 该方法接受任意数量的位置参数 args 和关键字参数 kwargs
+        # 抛出了 NotImplementedError 异常
+        # NotImplementedError 异常 通常用于指示某个方法或功能尚未实现，需要在子类中进行实现或重写。
         raise NotImplementedError
 
 
@@ -52,9 +55,14 @@ class TransformerEmbedder(AbstractEncoder):
 
 class BERTTokenizer(AbstractEncoder):
     """ Uses a pretrained BERT tokenizer by huggingface. Vocab size: 30522 (?)"""
+
+    # BERTEmbedder  self.tknz_fn = BERTTokenizer(vq_interface=False, max_length=77)
     def __init__(self, device="cuda", vq_interface=True, max_length=77):
         super().__init__()
+        # 调用Hugging Face 的 Transformers 库中的 BertTokenizerFast 类，该类用于快速地对文本进行分词处理
         from transformers import BertTokenizerFast  # TODO: add to reuquirements
+
+        # 创建了一个 BertTokenizerFast 的实例，并加载了预训练的 "bert-base-uncased" 模型对应的 tokenizer
         self.tokenizer = BertTokenizerFast.from_pretrained("bert-base-uncased")
         self.device = device
         self.vq_interface = vq_interface
@@ -79,10 +87,10 @@ class BERTTokenizer(AbstractEncoder):
 
 class BERTEmbedder(AbstractEncoder):
     """Uses the BERT tokenizr model and add some transformer encoder layers"""
-    def __init__(self, n_embed, n_layer, vocab_size=30522, max_seq_len=77,
+    def __init__(self, n_embed, n_layer, vocab_size=30522, max_seq_len=77,    # config里 n_embed: 1280 n_layer: 32
                  device="cuda",use_tokenizer=True, embedding_dropout=0.0):
         super().__init__()
-        self.use_tknz_fn = use_tokenizer
+        self.use_tknz_fn = use_tokenizer  # True
         if self.use_tknz_fn:
             self.tknz_fn = BERTTokenizer(vq_interface=False, max_length=max_seq_len)
         self.device = device
@@ -91,8 +99,8 @@ class BERTEmbedder(AbstractEncoder):
                                               emb_dropout=embedding_dropout)
 
     def forward(self, text):
-        if self.use_tknz_fn:
-            tokens = self.tknz_fn(text)#.to(self.device)
+        if self.use_tknz_fn:    # self.use_tknz_fn = True
+            tokens = self.tknz_fn(text) #.to(self.device)
         else:
             tokens = text
         z = self.transformer(tokens, return_embeddings=True)

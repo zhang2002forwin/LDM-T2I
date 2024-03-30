@@ -136,8 +136,8 @@ if __name__ == "__main__":
                 # get_learned_conditioning(条件c) 根据条件c获得学习到的条件信息
                 # 此处获得uc，即unconditional_conditioning
                 uc = model.get_learned_conditioning(opt.n_samples * [""])
-            for n in trange(opt.n_iter, desc="Sampling,first for-loop"):
-                c = model.get_learned_conditioning(opt.n_samples * [prompt])
+            for n in trange(opt.n_iter, desc="Sampling,first for-loop"):  # 采样opt.n_iter次  每次n.samples张图片
+                c = model.get_learned_conditioning(opt.n_samples * [prompt])  # 得到一个Tensor
                 shape = [4, opt.H//8, opt.W//8]
                 samples_ddim, _ = sampler.sample(S=opt.ddim_steps,  # ddim步数 50
                                                  conditioning=c,
@@ -147,12 +147,15 @@ if __name__ == "__main__":
                                                  unconditional_guidance_scale=opt.scale,
                                                  unconditional_conditioning=uc,
                                                  eta=opt.ddim_eta)
+                # 得到的samples_ddim的shape是[opt.n_samples,4,opt.H//8, opt.W//8]
 
-                x_samples_ddim = model.decode_first_stage(samples_ddim)
+                x_samples_ddim = model.decode_first_stage(samples_ddim) # AEKL上采样
+                # 把x_samples_ddim取值范围压到[0,1]
                 x_samples_ddim = torch.clamp((x_samples_ddim+1.0)/2.0, min=0.0, max=1.0)
 
                 for x_sample in x_samples_ddim:
                     x_sample = 255. * rearrange(x_sample.cpu().numpy(), 'c h w -> h w c')
+                    # 转换成整数,保存
                     Image.fromarray(x_sample.astype(np.uint8)).save(os.path.join(sample_path, f"{base_count:04}.png"))
                     base_count += 1
                 all_samples.append(x_samples_ddim)

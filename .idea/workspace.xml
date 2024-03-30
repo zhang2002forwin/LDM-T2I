@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="11789e92-3e39-4c70-8dc3-ee0802f1246d" name="更改" comment="'2024.3.2617：07'">
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/outputs/txt2img-samples/a-dog-is-playing-football,-in-VanGogh's-style.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/outputs/txt2img-samples/samples/0000.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/outputs/txt2img-samples/samples/0001.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/outputs/txt2img-samples/samples/0002.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/outputs/txt2img-samples/samples/0003.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/configs/latent-diffusion/txt2img-1p4B-eval.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/configs/latent-diffusion/txt2img-1p4B-eval.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ldm/models/autoencoder.py" beforeDir="false" afterPath="$PROJECT_DIR$/ldm/models/autoencoder.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ldm/models/diffusion/ddim.py" beforeDir="false" afterPath="$PROJECT_DIR$/ldm/models/diffusion/ddim.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ldm/models/diffusion/ddpm.py" beforeDir="false" afterPath="$PROJECT_DIR$/ldm/models/diffusion/ddpm.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ldm/modules/diffusionmodules/openaimodel.py" beforeDir="false" afterPath="$PROJECT_DIR$/ldm/modules/diffusionmodules/openaimodel.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ldm/modules/diffusionmodules/util.py" beforeDir="false" afterPath="$PROJECT_DIR$/ldm/modules/diffusionmodules/util.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ldm/modules/encoders/modules.py" beforeDir="false" afterPath="$PROJECT_DIR$/ldm/modules/encoders/modules.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ldm/modules/x_transformer.py" beforeDir="false" afterPath="$PROJECT_DIR$/ldm/modules/x_transformer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ldm/util.py" beforeDir="false" afterPath="$PROJECT_DIR$/ldm/util.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/txt2img.py" beforeDir="false" afterPath="$PROJECT_DIR$/txt2img.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="PREVIOUS_COMMIT_AUTHORS">
+      <list>
+        <option value="Robin Rombach &lt;robin.rombach@gmail.com&gt;" />
+      </list>
+    </option>
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="dev1" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="UPDATE_TYPE" value="REBASE" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5
+}</component>
+  <component name="ProjectId" id="2eA2eIFmbElfut2oopMPaTL8uWV" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;dev1&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RunManager">
+    <configuration name="txt2img" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="LDM-T2I" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/txt2img.py" />
+      <option name="PARAMETERS" value="--prompt &quot;a dog is playing football on the grass&quot; --ddim_eta 0.0 --n_samples 1 --n_iter 4 --scale 5.0  --ddim_steps 50" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.txt2img" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="应用程序级" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="默认任务">
+      <changelist id="11789e92-3e39-4c70-8dc3-ee0802f1246d" name="更改" comment="" />
+      <created>1711333157665</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1711333157665</updated>
+      <workItem from="1711333161227" duration="8432000" />
+      <workItem from="1711346346491" duration="795000" />
+      <workItem from="1711347233797" duration="30000" />
+      <workItem from="1711347324335" duration="68482000" />
+    </task>
+    <task id="LOCAL-00001" summary="&quot;补全了config构建类实例的test样例，重新下载了model.ckpt&quot;">
+      <option name="closed" value="true" />
+      <created>1711334875103</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1711334875103</updated>
+    </task>
+    <task id="LOCAL-00002" summary="&quot;增加了gitignore文件，把data、assets、modes、outputs忽略&quot;">
+      <option name="closed" value="true" />
+      <created>1711343496870</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1711343496870</updated>
+    </task>
+    <task id="LOCAL-00003" summary="&quot;增加了gitignore文件，把config、data、assets、models、outputs目录忽略&quot;">
+      <option name="closed" value="true" />
+      <created>1711345211694</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1711345211694</updated>
+    </task>
+    <task id="LOCAL-00004" summary="'加了gitignore'">
+      <option name="closed" value="true" />
+      <created>1711347060215</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1711347060215</updated>
+    </task>
+    <task id="LOCAL-00005" summary="'无ckpt，ignore为空'">
+      <option name="closed" value="true" />
+      <created>1711347620605</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1711347620605</updated>
+    </task>
+    <task id="LOCAL-00006" summary="'无ckpt，设置了ignore'">
+      <option name="closed" value="true" />
+      <created>1711347710261</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1711347710261</updated>
+    </task>
+    <task id="LOCAL-00007" summary="'测试增加一句注释 能不能推送成功'">
+      <option name="closed" value="true" />
+      <created>1711347765567</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1711347765567</updated>
+    </task>
+    <task id="LOCAL-00008" summary="'增加了从config创建类，并加载ckpt文件的注释'">
+      <option name="closed" value="true" />
+      <created>1711348710002</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1711348710002</updated>
+    </task>
+    <task id="LOCAL-00009" summary="'加了AutoencoderKL的部分注释'">
+      <option name="closed" value="true" />
+      <created>1711373172945</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1711373172945</updated>
+    </task>
+    <task id="LOCAL-00010" summary="'2024.3.26'">
+      <option name="closed" value="true" />
+      <created>1711437657242</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1711437657242</updated>
+    </task>
+    <task id="LOCAL-00011" summary="'2024.3.2617：07'">
+      <option name="closed" value="true" />
+      <created>1711444079637</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1711444079637</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="dev1" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Merge pull request #111 from CompVis/rdm&#10;&#10;RDM" />
+    <MESSAGE value="&quot;补全了config构建类实例的test样例，重新下载了model.ckpt&quot;" />
+    <MESSAGE value="&quot;增加了gitignore文件，把data、assets、modes、outputs忽略&quot;" />
+    <MESSAGE value="&quot;增加了gitignore文件，把config、data、assets、models、outputs目录忽略&quot;" />
+    <MESSAGE value="'加了gitignore'" />
+    <MESSAGE value="'无ckpt，ignore为空'" />
+    <MESSAGE value="'无ckpt，设置了ignore'" />
+    <MESSAGE value="'测试增加一句注释 能不能推送成功'" />
+    <MESSAGE value="'增加了从config创建类，并加载ckpt文件的注释'" />
+    <MESSAGE value="'加了AutoencoderKL的部分注释'" />
+    <MESSAGE value="'2024.3.26'" />
+    <MESSAGE value="'2024.3.2617：07'" />
+    <option name="LAST_COMMIT_MESSAGE" value="'2024.3.2617：07'" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/txt2img.py</url>
+          <line>110</line>
+          <option name="timeStamp" value="11" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/txt2img.py</url>
+          <line>115</line>
+          <option name="timeStamp" value="12" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ldm/util.py</url>
+          <line>87</line>
+          <option name="timeStamp" value="14" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ldm/modules/diffusionmodules/openaimodel.py</url>
+          <line>631</line>
+          <option name="timeStamp" value="21" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ldm/modules/diffusionmodules/openaimodel.py</url>
+          <line>691</line>
+          <option name="timeStamp" value="22" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ldm/models/diffusion/ddpm.py</url>
+          <line>452</line>
+          <option name="timeStamp" value="26" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ldm/models/diffusion/ddpm.py</url>
+          <line>88</line>
+          <option name="timeStamp" value="27" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ldm/models/diffusion/ddpm.py</url>
+          <line>1412</line>
+          <option name="timeStamp" value="28" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ldm/modules/diffusionmodules/openaimodel.py</url>
+          <line>604</line>
+          <option name="timeStamp" value="31" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ldm/modules/diffusionmodules/openaimodel.py</url>
+          <line>516</line>
+          <option name="timeStamp" value="34" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ldm/models/diffusion/ddpm.py</url>
+          <line>464</line>
+          <option name="timeStamp" value="37" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ldm/models/diffusion/ddpm.py</url>
+          <line>465</line>
+          <option name="timeStamp" value="38" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ldm/models/autoencoder.py</url>
+          <line>297</line>
+          <option name="timeStamp" value="39" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ldm/modules/diffusionmodules/model.py</url>
+          <line>418</line>
+          <option name="timeStamp" value="40" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ldm/modules/diffusionmodules/model.py</url>
+          <line>532</line>
+          <option name="timeStamp" value="41" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ldm/models/autoencoder.py</url>
+          <line>298</line>
+          <option name="timeStamp" value="42" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ldm/models/autoencoder.py</url>
+          <line>299</line>
+          <option name="timeStamp" value="43" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ldm/modules/encoders/modules.py</url>
+          <line>95</line>
+          <option name="timeStamp" value="46" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ldm/modules/x_transformer.py</url>
+          <line>396</line>
+          <option name="timeStamp" value="47" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ldm/modules/x_transformer.py</url>
+          <line>543</line>
+          <option name="timeStamp" value="49" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/txt2img.py</url>
+          <line>137</line>
+          <option name="timeStamp" value="50" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/txt2img.py</url>
+          <line>139</line>
+          <option name="timeStamp" value="51" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ldm/modules/encoders/modules.py</url>
+          <line>71</line>
+          <option name="timeStamp" value="52" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$USER_HOME$/anaconda3/envs/ldm/Lib/site-packages/transformers/tokenization_utils_base.py</url>
+          <line>2871</line>
+          <option name="timeStamp" value="53" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/txt2img.py</url>
+          <line>141</line>
+          <option name="timeStamp" value="54" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ldm/modules/diffusionmodules/util.py</url>
+          <line>59</line>
+          <option name="timeStamp" value="55" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ldm/models/diffusion/ddim.py</url>
+          <line>52</line>
+          <option name="timeStamp" value="57" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ldm/models/diffusion/ddim.py</url>
+          <line>64</line>
+          <option name="timeStamp" value="58" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ldm/models/diffusion/ddim.py</url>
+          <line>106</line>
+          <option name="timeStamp" value="59" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ldm/models/diffusion/ddim.py</url>
+          <line>160</line>
+          <option name="timeStamp" value="60" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ldm/models/diffusion/ddim.py</url>
+          <line>171</line>
+          <option name="timeStamp" value="61" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ldm/models/diffusion/ddpm.py</url>
+          <line>999</line>
+          <option name="timeStamp" value="62" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/LDM_T2I$txt2img.coverage" NAME="txt2img 覆盖结果" MODIFIED="1711545379318" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+  </component>
+</project>

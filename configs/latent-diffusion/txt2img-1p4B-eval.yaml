@@ -12,7 +12,7 @@ model:
     image_size: 32
     channels: 4
     cond_stage_trainable: true
-    conditioning_key: crossattn
+    conditioning_key: crossattn   # 指定条件如何进入UNet
     monitor: val/loss_simple_ema
     scale_factor: 0.18215
     use_ema: False
@@ -33,11 +33,11 @@ model:
         - 1
         - 2
         - 4
-        - 4
+        - 4   # 代码读入后是个列表channel_mult=[1,2,4,4]
         num_heads: 8
         use_spatial_transformer: true
         transformer_depth: 1
-        context_dim: 1280
+        context_dim: 1280  # the dimension of your cross-attention conditioning
         use_checkpoint: true
         legacy: False
 

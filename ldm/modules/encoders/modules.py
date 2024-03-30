@@ -62,7 +62,7 @@ class BERTTokenizer(AbstractEncoder):
         # 调用Hugging Face 的 Transformers 库中的 BertTokenizerFast 类，该类用于快速地对文本进行分词处理
         from transformers import BertTokenizerFast  # TODO: add to reuquirements
 
-        # 创建了一个 BertTokenizerFast 的实例，并加载了预训练的 "bert-base-uncased" 模型对应的 tokenizer
+        # 创建一个 BertTokenizerFast 实例，并使用 "bert-base-uncased" 模型的预训练分词规则
         self.tokenizer = BertTokenizerFast.from_pretrained("bert-base-uncased")
         self.device = device
         self.vq_interface = vq_interface
@@ -92,15 +92,17 @@ class BERTEmbedder(AbstractEncoder):
         super().__init__()
         self.use_tknz_fn = use_tokenizer  # True
         if self.use_tknz_fn:
-            self.tknz_fn = BERTTokenizer(vq_interface=False, max_length=max_seq_len)
+            self.tknz_fn = BERTTokenizer(vq_interface=False, max_length=max_seq_len)  # use_tknz_fn时，使用BERTTokeniszer类
         self.device = device
         self.transformer = TransformerWrapper(num_tokens=vocab_size, max_seq_len=max_seq_len,
-                                              attn_layers=Encoder(dim=n_embed, depth=n_layer),
+                                               attn_layers=Encoder(dim=n_embed, depth=n_layer),
                                               emb_dropout=embedding_dropout)
 
     def forward(self, text):
-        if self.use_tknz_fn:    # self.use_tknz_fn = True
+        # forward 将txt转换成tokens，然后送入Transformer中
+        if self.use_tknz_fn:    # self.use_tknz_fn = True  use_tknz_fn是use_tokenize_function
             tokens = self.tknz_fn(text) #.to(self.device)
+            # forward的类是BERTEmbedder,使用的tknz_fn是BERTTokernizer类的方法 执行BERTTokenizer的forward方法
         else:
             tokens = text
         z = self.transformer(tokens, return_embeddings=True)

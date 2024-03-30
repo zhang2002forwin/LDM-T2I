@@ -72,7 +72,7 @@ def count_params(model, verbose=False):
     total_params = sum(p.numel() for p in model.parameters())
     if verbose:
         print(f"{model.__class__.__name__} has {total_params * 1.e-6:.2f} M params.")
-    return total_params
+    return total_params  # unet共有872300484个参数
 
 
 def instantiate_from_config(config):
@@ -84,9 +84,9 @@ def instantiate_from_config(config):
         raise KeyError("Expected key `target` to instantiate.")
 
     # 相当于
-    # obj = get_obj_from_str(config["target"])  # 返回一个空对象（未被实例化）
-    # return obj(**config.get("params", dict()))  # 用params实例化对象Obj
-    return get_obj_from_str(config["target"])(**config.get("params", dict()))
+    obj = get_obj_from_str(config["target"])  # 返回一个空对象（未被实例化）
+    return obj(**config.get("params", dict()))  # 用params实例化对象Obj   # 但lossconfig里没有params
+    # return get_obj_from_str(config["target"])(**config.get("params", dict()))
 
 
 def get_obj_from_str(string, reload=False):
@@ -96,6 +96,7 @@ def get_obj_from_str(string, reload=False):
         importlib.reload(module_imp)
 
     # 返回一个空对象，实际是返回一个指针
+    # 先执行  importlib.import_module(module, package=None) 后执行getattr(importlib.import_module(module, package=None), cls)
     return getattr(importlib.import_module(module, package=None), cls)
 
 def _do_parallel_data_prefetch(func, Q, data, idx, idx_to_fn=False):

@@ -295,12 +295,12 @@ class AutoencoderKL(pl.LightningModule):
                  ):
         super().__init__()
         self.image_key = image_key
-        self.encoder = Encoder(**ddconfig)
-        self.decoder = Decoder(**ddconfig)
-        self.loss = instantiate_from_config(lossconfig)
+        self.encoder = Encoder(**ddconfig)  # 打印 making attention of type 'vanilla' with 512 in_channels
+        self.decoder = Decoder(**ddconfig)  # 打印 Working with z of shape (1, 4, 32, 32) = 4096 dimensions. 打印 making attention of type 'vanilla' with 512 in_channels
+        self.loss = instantiate_from_config(lossconfig)  # lossconfig里没有params  Identity()
         assert ddconfig["double_z"]
-        self.quant_conv = torch.nn.Conv2d(2*ddconfig["z_channels"], 2*embed_dim, 1)
-        self.post_quant_conv = torch.nn.Conv2d(embed_dim, ddconfig["z_channels"], 1)
+        self.quant_conv = torch.nn.Conv2d(2*ddconfig["z_channels"], 2*embed_dim, 1) # Conv2d(8,8,1)
+        self.post_quant_conv = torch.nn.Conv2d(embed_dim, ddconfig["z_channels"], 1)  # Conv2d(4,4,1)
         self.embed_dim = embed_dim
         if colorize_nlabels is not None:
             assert type(colorize_nlabels)==int

@@ -85,14 +85,15 @@ class DDPM(pl.LightningModule):
         self.image_size = image_size  # try conv?
         self.channels = channels
         self.use_positional_encodings = use_positional_encodings
+        # 去DiffusionWrapper类中 加载unet_config 参数
         self.model = DiffusionWrapper(unet_config, conditioning_key)
-        count_params(self.model, verbose=True)
-        self.use_ema = use_ema
+        count_params(self.model, verbose=True)  # 传入UNet count_params 打印DiffusionWrapper has 872.30 M params.
+        self.use_ema = use_ema  # False
         if self.use_ema:
             self.model_ema = LitEma(self.model)
             print(f"Keeping EMAs of {len(list(self.model_ema.buffers()))}.")
 
-        self.use_scheduler = scheduler_config is not None
+        self.use_scheduler = scheduler_config is not None  # self.use_scheduler是False
         if self.use_scheduler:
             self.scheduler_config = scheduler_config
 
@@ -100,19 +101,19 @@ class DDPM(pl.LightningModule):
         self.original_elbo_weight = original_elbo_weight
         self.l_simple_weight = l_simple_weight
 
-        if monitor is not None:
+        if monitor is not None:  # 成立
             self.monitor = monitor
-        if ckpt_path is not None:
+        if ckpt_path is not None:  # 不成立
             self.init_from_ckpt(ckpt_path, ignore_keys=ignore_keys, only_model=load_only_unet)
-
+        # register_scahedule在下面
         self.register_schedule(given_betas=given_betas, beta_schedule=beta_schedule, timesteps=timesteps,
                                linear_start=linear_start, linear_end=linear_end, cosine_s=cosine_s)
 
         self.loss_type = loss_type
 
         self.learn_logvar = learn_logvar
-        self.logvar = torch.full(fill_value=logvar_init, size=(self.num_timesteps,))
-        if self.learn_logvar:
+        self.logvar = torch.full(fill_value=logvar_init, size=(self.num_timesteps,)) # 用fill_value填充大小为size，得到一个tensor
+        if self.learn_logvar:   # False
             self.logvar = nn.Parameter(self.logvar, requires_grad=True)
 
 
@@ -120,12 +121,12 @@ class DDPM(pl.LightningModule):
                           linear_start=1e-4, linear_end=2e-2, cosine_s=8e-3):
         if exists(given_betas):
             betas = given_betas
-        else:
+        else: # make_beta_schedule在ldm/modules/diffusionmodules/util.py
             betas = make_beta_schedule(beta_schedule, timesteps, linear_start=linear_start, linear_end=linear_end,
                                        cosine_s=cosine_s)
         alphas = 1. - betas
-        alphas_cumprod = np.cumprod(alphas, axis=0)
-        alphas_cumprod_prev = np.append(1., alphas_cumprod[:-1])
+        alphas_cumprod = np.cumprod(alphas, axis=0) # 依次累积,alphas_cumprod[0] = alphas[0], alphas_cumprod[i] = alphas[i]* alphas_cumprod[i-1]
+        alphas_cumprod_prev = np.append(1., alphas_cumprod[:-1]) # alphas_cumprod_prev的长度与alphas_cumprod一致
 
         timesteps, = betas.shape
         self.num_timesteps = int(timesteps)
@@ -437,6 +438,7 @@ class LatentDiffusion(DDPM):
                  scale_factor=1.0,
                  scale_by_std=False,
                  *args, **kwargs):
+        # 暂时没有加载unet_config
         self.num_timesteps_cond = default(num_timesteps_cond, 1)
         self.scale_by_std = scale_by_std
         assert self.num_timesteps_cond <= kwargs['timesteps']
@@ -447,6 +449,7 @@ class LatentDiffusion(DDPM):
             conditioning_key = None
         ckpt_path = kwargs.pop("ckpt_path", None)
         ignore_keys = kwargs.pop("ignore_keys", [])
+        # 去DDPM类中加载剩余的params  包括unet_config的参数
         super().__init__(conditioning_key=conditioning_key, *args, **kwargs)
         self.concat_mode = concat_mode
         self.cond_stage_trainable = cond_stage_trainable
@@ -455,13 +458,13 @@ class LatentDiffusion(DDPM):
             self.num_downs = len(first_stage_config.params.ddconfig.ch_mult) - 1
         except:
             self.num_downs = 0
-        if not scale_by_std:
+        if not scale_by_std:  # 成立
             self.scale_factor = scale_factor
         else:
             self.register_buffer('scale_factor', torch.tensor(scale_factor))
-        self.instantiate_first_stage(first_stage_config)  # 加载
-        self.instantiate_cond_stage(cond_stage_config)
-        self.cond_stage_forward = cond_stage_forward
+        self.instantiate_first_stage(first_stage_config)  # 加载AutoencoderKL
+        self.instantiate_cond_stage(cond_stage_config)    # 加载BERT
+        self.cond_stage_forward = cond_stage_forward      # None
         self.clip_denoised = False
         self.bbox_tokenizer = None  
 
@@ -497,19 +500,19 @@ class LatentDiffusion(DDPM):
                           linear_start=1e-4, linear_end=2e-2, cosine_s=8e-3):
         super().register_schedule(given_betas, beta_schedule, timesteps, linear_start, linear_end, cosine_s)
 
-        self.shorten_cond_schedule = self.num_timesteps_cond > 1
+        self.shorten_cond_schedule = self.num_timesteps_cond > 1  # False
         if self.shorten_cond_schedule:
             self.make_cond_schedule()
 
     def instantiate_first_stage(self, config):  # 实例化config文件中的 first_stage_config
         model = instantiate_from_config(config)  # 用config实例化first_stage_config类
-        self.first_stage_model = model.eval()  # t2i中是AutoencoderKL
+        self.first_stage_model = model.eval()  # 锁住AEKL的参数值
         self.first_stage_model.train = disabled_train
         for param in self.first_stage_model.parameters():
             param.requires_grad = False
 
     def instantiate_cond_stage(self, config):  # 实例化config文件中的 cond_stage_config
-        if not self.cond_stage_trainable:  # BERT Embedder是直接拿来用，所以我推测 cond_stage_trianable 是false
+        if not self.cond_stage_trainable:  # 不成立
             if config == "__is_first_stage__":
                 print("Using first stage also as cond stage.")
                 self.cond_stage_model = self.first_stage_model
@@ -557,7 +560,7 @@ class LatentDiffusion(DDPM):
             # callable(self.cond_stage_model.encode) 检查cond_stage_model的encoder是否可以调用
             if hasattr(self.cond_stage_model, 'encode') and callable(self.cond_stage_model.encode):
                 c = self.cond_stage_model.encode(c)
-                if isinstance(c, DiagonalGaussianDistribution): #
+                if isinstance(c, DiagonalGaussianDistribution): # 传入uc时，得到的结果只是个torch.tensor
                     c = c.mode()
             else:
                 c = self.cond_stage_model(c)
@@ -899,7 +902,7 @@ class LatentDiffusion(DDPM):
         return [rescale_bbox(b) for b in bboxes]
 
     def apply_model(self, x_noisy, t, cond, return_ids=False):
-
+    # x_in  t_in  cond是uc和c的拼接
         if isinstance(cond, dict):
             # hybrid case, cond is exptected to be a dict
             pass
@@ -909,7 +912,7 @@ class LatentDiffusion(DDPM):
             key = 'c_concat' if self.model.conditioning_key == 'concat' else 'c_crossattn'
             cond = {key: cond}
 
-        if hasattr(self, "split_input_params"):
+        if hasattr(self, "split_input_params"):  # 没执行
             assert len(cond) == 1  # todo can only deal with one conditioning atm
             assert not return_ids  
             ks = self.split_input_params["ks"]  # eg. (128, 128)
@@ -993,8 +996,9 @@ class LatentDiffusion(DDPM):
             # stitch crops together
             x_recon = fold(o) / normalization
 
-        else:
-            x_recon = self.model(x_noisy, t, **cond)
+        else:  # DiffusionWrapper类的forward   UNet的forward
+            x_recon = self.model(x_noisy, t, **cond)  # 噪声图、时间步t、条件uc和c的拼接
+
 
         if isinstance(x_recon, tuple) and not return_ids:
             return x_recon[0]
@@ -1405,8 +1409,9 @@ class LatentDiffusion(DDPM):
 class DiffusionWrapper(pl.LightningModule):
     def __init__(self, diff_model_config, conditioning_key):
         super().__init__()
+        # 把unet_config的参数 加载到diffusion_model中
         self.diffusion_model = instantiate_from_config(diff_model_config)
-        self.conditioning_key = conditioning_key
+        self.conditioning_key = conditioning_key  # 'crossattn'
         assert self.conditioning_key in [None, 'concat', 'crossattn', 'hybrid', 'adm']
 
     def forward(self, x, t, c_concat: list = None, c_crossattn: list = None):

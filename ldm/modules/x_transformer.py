@@ -99,7 +99,7 @@ def group_dict_by_key(cond, d):
     return (*return_val,)
 
 
-def string_begins_with(prefix, str):
+def string_begins_with(prefix, str): # 检查str 是否以prefix开头，是，返回True,否则返回False
     return str.startswith(prefix)
 
 
@@ -394,7 +394,7 @@ class AttentionLayers(nn.Module):
     ):
         super().__init__()
         ff_kwargs, kwargs = groupby_prefix_and_trim('ff_', kwargs)
-        attn_kwargs, _ = groupby_prefix_and_trim('attn_', kwargs)
+        attn_kwargs, _ = groupby_prefix_and_trim('attn_', kwargs)  # 函数返回{}、{}
 
         dim_head = attn_kwargs.get('dim_head', DEFAULT_DIM_HEAD)
 

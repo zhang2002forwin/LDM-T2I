@@ -22,7 +22,7 @@ def make_beta_schedule(schedule, n_timestep, linear_start=1e-4, linear_end=2e-2,
     if schedule == "linear":
         betas = (
                 torch.linspace(linear_start ** 0.5, linear_end ** 0.5, n_timestep, dtype=torch.float64) ** 2
-        )
+        ) # 从 sqrt(linear_start) 到 sqrt(linear_end) 的 n_timestep个等间距的数。再对这些数取平方
 
     elif schedule == "cosine":
         timesteps = (
@@ -58,21 +58,21 @@ def make_ddim_timesteps(ddim_discr_method, num_ddim_timesteps, num_ddpm_timestep
     steps_out = ddim_timesteps + 1
     if verbose:
         print(f'Selected timesteps for ddim sampler: {steps_out}')
-    return steps_out
+    return steps_out  # 得到+1后的step数组
 
 
 def make_ddim_sampling_parameters(alphacums, ddim_timesteps, eta, verbose=True):
     # select alphas for computing the variance schedule
-    alphas = alphacums[ddim_timesteps]
-    alphas_prev = np.asarray([alphacums[0]] + alphacums[ddim_timesteps[:-1]].tolist())
+    alphas = alphacums[ddim_timesteps]   # 从alpha累积数组中，将 +1 数组元素作为index ,得到长度与"+1数组"一致的alpha
+    alphas_prev = np.asarray([alphacums[0]] + alphacums[ddim_timesteps[:-1]].tolist())  # 没看懂alphas_prev是要干嘛
 
-    # according the the formula provided in https://arxiv.org/abs/2010.02502
-    sigmas = eta * np.sqrt((1 - alphas_prev) / (1 - alphas) * (1 - alphas / alphas_prev))
+    # according the the formula provided in https://arxiv.org/abs/2010.02502  DDIM论文
+    sigmas = eta * np.sqrt((1 - alphas_prev) / (1 - alphas) * (1 - alphas / alphas_prev))  # ？ eta设置为0了啊
     if verbose:
-        print(f'Selected alphas for ddim sampler: a_t: {alphas}; a_(t-1): {alphas_prev}')
+        print(f'Selected alphas for ddim sampler: a_t: {alphas}; a_(t-1): {alphas_prev}')  # 给了a_t 和 a_(t-1)
         print(f'For the chosen value of eta, which is {eta}, '
               f'this results in the following sigma_t schedule for ddim sampler {sigmas}')
-    return sigmas, alphas, alphas_prev
+    return sigmas, alphas, alphas_prev # 返回sigmas,a_t 和 a_(t-1)
 
 
 def betas_for_alpha_bar(num_diffusion_timesteps, alpha_bar, max_beta=0.999):

@@ -513,10 +513,12 @@ class UNetModel(nn.Module):
         if self.num_classes is not None:
             self.label_emb = nn.Embedding(num_classes, time_embed_dim)
 
+        # UNet类的input_blocks的断点
         self.input_blocks = nn.ModuleList(
             [
                 TimestepEmbedSequential(
                     conv_nd(dims, in_channels, model_channels, 3, padding=1)
+                    # 因为dims=2，创建了一个conv_2d(in_channels=in_channesl,out_channels=model_channels,kernel_size=3,padding=1)
                 )
             ]
         )
@@ -524,7 +526,10 @@ class UNetModel(nn.Module):
         input_block_chans = [model_channels]
         ch = model_channels
         ds = 1
-        for level, mult in enumerate(channel_mult):
+        for level, mult in enumerate(channel_mult):   # channel_mult是个list，level是个list索引，mult是list里的值
+            # channel_mult是[1,2,4,4]
+            # level取值[0,1,2,3]
+            # mult取值[1,2,4,4]
             for _ in range(num_res_blocks):
                 layers = [
                     ResBlock(
@@ -558,9 +563,10 @@ class UNetModel(nn.Module):
                             ch, num_heads, dim_head, depth=transformer_depth, context_dim=context_dim
                         )
                     )
-                self.input_blocks.append(TimestepEmbedSequential(*layers))
+                self.input_blocks.append(TimestepEmbedSequential(*layers))  # input_blocks
                 self._feature_size += ch
                 input_block_chans.append(ch)
+                # end of for-loop
             if level != len(channel_mult) - 1:
                 out_ch = ch
                 self.input_blocks.append(
@@ -594,6 +600,8 @@ class UNetModel(nn.Module):
         if legacy:
             #num_heads = 1
             dim_head = ch // num_heads if use_spatial_transformer else num_head_channels
+
+        # UNet的middle_block
         self.middle_block = TimestepEmbedSequential(
             ResBlock(
                 ch,
@@ -622,7 +630,8 @@ class UNetModel(nn.Module):
             ),
         )
         self._feature_size += ch
-
+        # UNet类的out_blocks的断点
+        # output_blocks
         self.output_blocks = nn.ModuleList([])
         for level, mult in list(enumerate(channel_mult))[::-1]:
             for i in range(num_res_blocks + 1):
@@ -679,18 +688,20 @@ class UNetModel(nn.Module):
                 self.output_blocks.append(TimestepEmbedSequential(*layers))
                 self._feature_size += ch
 
+        # out
         self.out = nn.Sequential(
             normalization(ch),
             nn.SiLU(),
             zero_module(conv_nd(dims, model_channels, out_channels, 3, padding=1)),
         )
-        if self.predict_codebook_ids:
+
+        if self.predict_codebook_ids:  # False
             self.id_predictor = nn.Sequential(
             normalization(ch),
             conv_nd(dims, model_channels, n_embed, 1),
             #nn.LogSoftmax(dim=1)  # change to cross_entropy and produce non-normalized logits
         )
-
+    # end of __init__ in UNet
     def convert_to_fp16(self):
         """
         Convert the torso of the model to float16.
